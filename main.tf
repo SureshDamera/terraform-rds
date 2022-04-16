@@ -51,7 +51,6 @@ resource "aws_security_group" "onmo-aurora" {
 
 resource "aws_db_instance" "onmostealth-aurora-instance-1" {
     identifier                = "onmostealth-aurora-${var.app_name}-instance-1"
-    storage_type              = "aurora"
     engine                    = "aurora-mysql"
     engine_version            = "5.7.mysql_aurora.2.09.2"
     instance_class            = "db.r5.large"
