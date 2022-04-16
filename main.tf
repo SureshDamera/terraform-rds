@@ -44,7 +44,7 @@ resource "aws_db_instance" "onmostealth-aurora-instance-1" {
     publicly_accessible       = false
     availability_zone         = "me-south-1b"
     security_group_names      = []
-    vpc_security_group_ids    = [aws_security_group.dbsg.id] #["sg-06d418850e82b99a1"]
+    vpc_security_group_ids    = ["sg-06d418850e82b99a1"] #[aws_security_group.dbsg.id] 
     db_subnet_group_name      = aws_db_subnet_group.onmostealth-aurora-instance-1.name #"default-vpc-04be9032fa38110b8"
     parameter_group_name      = "default.aurora-mysql5.7"
     multi_az                  = false
