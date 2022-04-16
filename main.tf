@@ -43,9 +43,9 @@ resource "aws_security_group" "onmo-aurora" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    Name = "allow_tls"
-  }
+  tags = merge({
+                    Name = "sg-aurora-db-${var.app_name}"
+                 }, var.tags)
 }
 
 
