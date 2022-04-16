@@ -22,7 +22,7 @@ output "aws_subnet_ids" {
 
 resource "aws_db_subnet_group" "onmostealth-aurora-instance-1" {
   name       = "onmostealth-aurora-instance-1"
-  subnet_ids = [data.aws_subnet_ids.database_subnets.ids]
+  subnet_ids = data.aws_subnet_ids.database_subnets.ids
 
   tags = {
     Name = "onmostealth-aurora-instance-1 DB subnet group"
