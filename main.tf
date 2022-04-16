@@ -1,7 +1,7 @@
 data "aws_vpc" "vpc_name" {
     filter {
         name   = "Name"
-        value = "${var.app_name}-vpc"
+        values = "${var.app_name}-vpc"
     }
 }
 
@@ -17,12 +17,12 @@ output "vpc_id" {
 }
 
 output "aws_subnet_ids" {
-  value = aws_subnet_ids.database_subnets.ids
+  value = data.aws_subnet_ids.database_subnets.ids
 }
 
 resource "aws_db_subnet_group" "onmostealth-aurora-instance-1" {
   name       = "onmostealth-aurora-instance-1"
-  subnet_ids = [aws_subnets.database_subnets.ids]
+  subnet_ids = [data.aws_subnets.database_subnets.ids]
 
   tags = {
     Name = "onmostealth-aurora-instance-1 DB subnet group"
