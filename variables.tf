@@ -13,7 +13,7 @@ variable "tags" {
 variable "app_name" {
   type        = string
   description = "application name"
-  default     = "test"
+  default     = "demo"
 }
 
 variable "AWS_REGION" {
