@@ -60,7 +60,7 @@ resource "aws_db_instance" "onmostealth-aurora-instance-1" {
     password                  = var.onmostealth_password
     port                      = var.onmostealth_port
     publicly_accessible       = false
-    #availability_zone         = "us-east-1a"
+    availability_zone         = "us-east-1a"
     security_group_names      = []
     vpc_security_group_ids    = [aws_security_group.onmo-aurora.id] 
     db_subnet_group_name      = aws_db_subnet_group.onmostealth-aurora-instance-1.name #"default-vpc-04be9032fa38110b8"
