@@ -55,6 +55,7 @@ resource "aws_db_instance" "onmostealth-aurora-instance-1" {
     engine_version            = "5.7.mysql_aurora.2.09.2"
     instance_class            = "db.r5.large"
     name                      = "onmo"
+    allocated_storage         = 1
     username                  = var.onmostealth_username
     password                  = var.onmostealth_password
     port                      = var.onmostealth_port
