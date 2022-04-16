@@ -42,12 +42,12 @@ resource "aws_db_instance" "onmostealth-aurora-instance-1" {
     password                  = var.onmostealth_password
     port                      = var.onmostealth_port
     publicly_accessible       = false
-    availability_zone         = "me-south-1b"
+    # availability_zone         = "me-south-1b"
     security_group_names      = []
     vpc_security_group_ids    = ["sg-06d418850e82b99a1"] #[aws_security_group.dbsg.id] 
     db_subnet_group_name      = aws_db_subnet_group.onmostealth-aurora-instance-1.name #"default-vpc-04be9032fa38110b8"
     parameter_group_name      = "default.aurora-mysql5.7"
-    multi_az                  = false
+    multi_az                  = true #false
     backup_retention_period   = 1
     backup_window             = "11:20-11:50"
     maintenance_window        = "tue:12:36-tue:13:06"
