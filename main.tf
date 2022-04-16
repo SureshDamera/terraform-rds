@@ -5,11 +5,8 @@ data "aws_vpc" "vpc_name" {
     }
 }
 
-data "aws_subnets" "database_subnets" {
-    filter {
-        name   = "vpc-id"
-        values = data.aws_vpc.vpc_name.id
-    } 
+data "aws_subnet_ids" "database_subnets" {
+    vpc_id = data.aws_vpc.vpc_name.id
     tags = {
         Name = "demo-vpc-db-*"
    }
@@ -19,8 +16,8 @@ output "vpc_id" {
   value = data.aws_vpc.vpc_name.id
 }
 
-output "subnet_ids" {
-  value = aws_subnets.database_subnets.ids
+output "aws_subnet_ids" {
+  value = aws_subnet_ids.database_subnets.ids
 }
 
 resource "aws_db_subnet_group" "onmostealth-aurora-instance-1" {
