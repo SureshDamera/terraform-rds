@@ -12,20 +12,39 @@ data "aws_subnet_ids" "database_subnets" {
    }
 }
 
-output "vpc_id" {
-  value = data.aws_vpc.vpc_name.id
-}
-
-output "aws_subnet_ids" {
-  value = data.aws_subnet_ids.database_subnets.ids
-}
-
 resource "aws_db_subnet_group" "onmostealth-aurora-instance-1" {
   name       = "onmostealth-aurora-instance-1"
   subnet_ids = data.aws_subnet_ids.database_subnets.ids
 
   tags = {
     Name = "onmostealth-aurora-instance-1 DB subnet group"
+  }
+}
+
+resource "aws_security_group" "onmo-aurora" {
+  name        = "aurora_db_sg"
+  description = "Allow Aurora DB traffic"
+  vpc_id      = data.aws_vpc.vpc_name.id
+
+  ingress {
+    description      = "Allow requests from only VPC"
+    from_port        = var.onmostealth_port
+    to_port          = onmostealth_port
+    protocol         = "tcp"
+    cidr_blocks      = [data.aws_vpc.vpc_name.cidr_block]
+    ipv6_cidr_blocks = [data.aws_vpc.vpc_name.ipv6_cidr_block]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "allow_tls"
   }
 }
 
@@ -44,7 +63,7 @@ resource "aws_db_instance" "onmostealth-aurora-instance-1" {
     publicly_accessible       = false
     # availability_zone         = "me-south-1b"
     security_group_names      = []
-    vpc_security_group_ids    = ["sg-06d418850e82b99a1"] #[aws_security_group.dbsg.id] 
+    vpc_security_group_ids    = [aws_security_group.onmo-aurora.id] 
     db_subnet_group_name      = aws_db_subnet_group.onmostealth-aurora-instance-1.name #"default-vpc-04be9032fa38110b8"
     parameter_group_name      = "default.aurora-mysql5.7"
     multi_az                  = true #false
