@@ -29,7 +29,7 @@ resource "aws_security_group" "onmo-aurora" {
   ingress {
     description      = "Allow requests from only VPC"
     from_port        = var.onmostealth_port
-    to_port          = onmostealth_port
+    to_port          = var.onmostealth_port
     protocol         = "tcp"
     cidr_blocks      = [data.aws_vpc.vpc_name.cidr_block]
     ipv6_cidr_blocks = [data.aws_vpc.vpc_name.ipv6_cidr_block]
