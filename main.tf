@@ -1,6 +1,6 @@
 data "aws_vpc" "vpc_name" {
     filter {
-        name   = "Name"
+        name   = "tag:Name"
         values = ["${var.app_name}-vpc"]
     }
 }
