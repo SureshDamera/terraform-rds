@@ -71,3 +71,15 @@ resource "aws_rds_cluster" "onmostealth-aurora-instance-1" {
     Name = "db-${terraform.workspace}"
   }, var.tags)
 }
+
+resource "aws_rds_cluster_instance" "cluster_instances" {
+  count                   = 1
+  identifier              = "onmostealth-aurora-${var.app_name}-instance-1"
+  cluster_identifier      = aws_rds_cluster.onmostealth-aurora-instance-1.id
+  instance_class          = "db.r5.large"
+  engine                  = aws_rds_cluster.onmostealth-aurora-instance-1.engine
+  engine_version          = aws_rds_cluster.onmostealth-aurora-instance-1.engine_version
+  publicly_accessible     = false
+  db_parameter_group_name = "default.aurora-mysql5.7"
+}
+
