@@ -58,7 +58,7 @@ resource "aws_rds_cluster" "onmostealth-aurora-instance-1" {
   master_username                 = var.onmostealth_username
   master_password                 = var.onmostealth_password
   port                            = var.onmostealth_port
-  availability_zones              = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones              = ["us-east-1a", "us-east-1b"]
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
   db_subnet_group_name            = aws_db_subnet_group.onmostealth-aurora-instance-1.name #"default-vpc-04be9032fa38110b8"
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
