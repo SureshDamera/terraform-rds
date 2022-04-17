@@ -1,15 +1,15 @@
 data "aws_vpc" "vpc_name" {
-    filter {
-        name   = "tag:Name"
-        values = ["${var.app_name}-vpc"]
-    }
+  filter {
+    name   = "tag:Name"
+    values = ["${var.app_name}-vpc"]
+  }
 }
 
 data "aws_subnet_ids" "database_subnets" {
-    vpc_id = data.aws_vpc.vpc_name.id
-    tags = {
-        Name = "demo-vpc-db-*"
-   }
+  vpc_id = data.aws_vpc.vpc_name.id
+  tags = {
+    Name = "demo-vpc-db-*"
+  }
 }
 
 resource "aws_db_subnet_group" "onmostealth-aurora-instance-1" {
@@ -44,33 +44,30 @@ resource "aws_security_group" "onmo-aurora" {
   }
 
   tags = merge({
-                    Name = "sg-aurora-db-${var.app_name}"
-                 }, var.tags)
+    Name = "sg-aurora-db-${var.app_name}"
+  }, var.tags)
 }
 
 
-resource "aws_db_instance" "onmostealth-aurora-instance-1" {
-    identifier                = "onmostealth-aurora-${var.app_name}-instance-1"
-    engine                    = "aurora-mysql"
-    engine_version            = "5.7.mysql_aurora.2.09.2"
-    instance_class            = "db.r5.large"
-    name                      = "onmo"
-    allocated_storage         = 1
-    username                  = var.onmostealth_username
-    password                  = var.onmostealth_password
-    port                      = var.onmostealth_port
-    publicly_accessible       = false
-    availability_zone         = "us-east-1a"
-    security_group_names      = []
-    vpc_security_group_ids    = [aws_security_group.onmo-aurora.id] 
-    db_subnet_group_name      = aws_db_subnet_group.onmostealth-aurora-instance-1.name #"default-vpc-04be9032fa38110b8"
-    parameter_group_name      = "default.aurora-mysql5.7"
-    multi_az                  = false
-    backup_retention_period   = 1
-    backup_window             = "11:20-11:50"
-    maintenance_window        = "tue:12:36-tue:13:06"
-    final_snapshot_identifier = "onmostealth-aurora-${var.app_name}-instance-1-final"
-    tags = merge({
-                    Name = "db-${terraform.workspace}"
-                 }, var.tags)
+resource "aws_rds_cluster" "onmostealth-aurora-instance-1" {
+  cluster_identifier              = "onmostealth-aurora-${var.app_name}-instance-1"
+  engine                          = "aurora-mysql"
+  engine_version                  = "5.7.mysql_aurora.2.09.2"
+  db_cluster_instance_class       = "db.r5.large"
+  database_name                   = "onmo"
+  master_username                 = var.onmostealth_username
+  master_password                 = var.onmostealth_password
+  port                            = var.onmostealth_port
+  availability_zone               = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
+  db_subnet_group_name            = aws_db_subnet_group.onmostealth-aurora-instance-1.name #"default-vpc-04be9032fa38110b8"
+  db_cluster_parameter_group_name = "default.aurora-mysql5.7"
+  #multi_az                  = false
+  backup_retention_period      = 1
+  preferred_backup_window      = "11:20-11:50"
+  preferred_maintenance_window = "tue:12:36-tue:13:06"
+  final_snapshot_identifier    = "onmostealth-aurora-${var.app_name}-instance-1-final"
+  tags = merge({
+    Name = "db-${terraform.workspace}"
+  }, var.tags)
 }
