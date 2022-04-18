@@ -8,7 +8,7 @@ data "aws_vpc" "vpc_name" {
 data "aws_subnet_ids" "database_subnets" {
   vpc_id = data.aws_vpc.vpc_name.id
   tags = {
-    Name = "demo-vpc-db-*"
+    Name = "${var.app_name}-vpc-db-*"
   }
 }
 
