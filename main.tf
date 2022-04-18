@@ -48,16 +48,23 @@ resource "aws_security_group" "onmo-aurora" {
   }, var.tags)
 }
 
+resource "aws_rds_global_cluster" "onmo" {
+  global_cluster_identifier = "onmo"
+  engine                    = "aurora-mysql"
+  engine_version            = "5.7.mysql_aurora.2.09.2"
+  database_name             = "onmo"
+}
 
 resource "aws_rds_cluster" "onmostealth-aurora-cluster" {
   cluster_identifier              = "onmostealth-aurora-${var.app_name}"
-  engine                          = "aurora-mysql"
-  engine_version                  = "5.7.mysql_aurora.2.09.2"
-  database_name                   = "onmo"
+  engine                          = aws_rds_global_cluster.onmo.engine
+  engine_version                  = aws_rds_global_cluster.onmo.engine_version
+  database_name                   = aws_rds_global_cluster.onmo.database_name
   master_username                 = var.onmostealth_username
   master_password                 = var.onmostealth_password
   port                            = var.onmostealth_port
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
+  global_cluster_identifier       = aws_rds_global_cluster.onmo.id
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
   db_subnet_group_name            = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
   #multi_az                  = false
@@ -76,8 +83,8 @@ resource "aws_rds_cluster_instance" "onmostealth-aurora-cluster_instances" {
   cluster_identifier = aws_rds_cluster.onmostealth-aurora-cluster.id
   instance_class     = "db.r5.large"
   #availability_zone       = ["us-east-1a", "us-east-1b"]
-  engine                  = aws_rds_cluster.onmostealth-aurora-cluster.engine
-  engine_version          = aws_rds_cluster.onmostealth-aurora-cluster.engine_version
+  engine                  = aws_rds_global_cluster.onmo.engine
+  engine_version          = aws_rds_global_cluster.onmo.engine_version
   publicly_accessible     = false
   db_parameter_group_name = "default.aurora-mysql5.7"
   promotion_tier          = 1
@@ -86,13 +93,14 @@ resource "aws_rds_cluster_instance" "onmostealth-aurora-cluster_instances" {
 
 resource "aws_rds_cluster" "onmoauth-aurora-cluster" {
   cluster_identifier              = "onmoauth-aurora-${var.app_name}"
-  engine                          = "aurora-mysql"
-  engine_version                  = "5.7.mysql_aurora.2.09.2"
-  database_name                   = "onmo"
+  engine                          = aws_rds_global_cluster.onmo.engine
+  engine_version                  = aws_rds_global_cluster.onmo.engine_version
+  database_name                   = aws_rds_global_cluster.onmo.database_name
   master_username                 = var.onmoauth_username
   master_password                 = var.onmoauth_password
   port                            = var.onmoauth_port
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
+  global_cluster_identifier       = aws_rds_global_cluster.onmo.id
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
   db_subnet_group_name            = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
   #multi_az                  = false
@@ -111,8 +119,8 @@ resource "aws_rds_cluster_instance" "onmoauth-aurora-cluster_instances" {
   cluster_identifier = aws_rds_cluster.onmoauth-aurora-cluster.id
   instance_class     = "db.r5.large"
   #availability_zone       = ["us-east-1a", "us-east-1b"] 
-  engine                  = aws_rds_cluster.onmoauth-aurora-cluster.engine
-  engine_version          = aws_rds_cluster.onmoauth-aurora-cluster.engine_version
+  engine                  = aws_rds_global_cluster.onmo.engine
+  engine_version          = aws_rds_global_cluster.onmo.engine_version
   publicly_accessible     = false
   db_parameter_group_name = "default.aurora-mysql5.7"
   promotion_tier          = 1
