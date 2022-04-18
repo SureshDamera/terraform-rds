@@ -12,12 +12,12 @@ data "aws_subnet_ids" "database_subnets" {
   }
 }
 
-resource "aws_db_subnet_group" "onmostealth-aurora-instance-1" {
-  name       = "onmostealth-aurora-instance-1"
+resource "aws_db_subnet_group" "onmo" {
+  name       = "onmo"
   subnet_ids = data.aws_subnet_ids.database_subnets.ids
 
   tags = {
-    Name = "onmostealth-aurora-instance-1 DB subnet group"
+    Name = "onmo DB subnet group"
   }
 }
 
@@ -49,7 +49,7 @@ resource "aws_security_group" "onmo-aurora" {
 }
 
 
-resource "aws_rds_cluster" "onmostealth-aurora-instance-1" {
+resource "aws_rds_cluster" "onmostealth-aurora-cluster" {
   cluster_identifier              = "onmostealth-aurora-${var.app_name}"
   engine                          = "aurora-mysql"
   engine_version                  = "5.7.mysql_aurora.2.09.2"
@@ -63,21 +63,56 @@ resource "aws_rds_cluster" "onmostealth-aurora-instance-1" {
   backup_retention_period      = 1
   preferred_backup_window      = "11:20-11:50"
   preferred_maintenance_window = "tue:12:36-tue:13:06"
-  final_snapshot_identifier    = "onmostealth-aurora-${var.app_name}-instance-1-final"
+  final_snapshot_identifier    = "onmostealth-aurora-${var.app_name}-final"
   tags = merge({
     Name = "db-${terraform.workspace}"
   }, var.tags)
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {
-  count                   = 1
-  identifier              = "onmostealth-aurora-${var.app_name}-instance-1"
-  cluster_identifier      = aws_rds_cluster.onmostealth-aurora-instance-1.id
-  instance_class          = "db.r5.large"
+  count              = 1
+  identifier         = "onmostealth-aurora-${var.app_name}-instance-1"
+  cluster_identifier = aws_rds_cluster.onmostealth-aurora-cluster.id
+  instance_class     = "db.r5.large"
   #availability_zone       = ["us-east-1a", "us-east-1b"]
-  db_subnet_group_name    = aws_db_subnet_group.onmostealth-aurora-instance-1.name #"default-vpc-04be9032fa38110b8"
-  engine                  = aws_rds_cluster.onmostealth-aurora-instance-1.engine
-  engine_version          = aws_rds_cluster.onmostealth-aurora-instance-1.engine_version
+  db_subnet_group_name    = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
+  engine                  = aws_rds_cluster.onmostealth-aurora-cluster.engine
+  engine_version          = aws_rds_cluster.onmostealth-aurora-cluster.engine_version
+  publicly_accessible     = false
+  db_parameter_group_name = "default.aurora-mysql5.7"
+  promotion_tier          = 1
+}
+
+
+resource "aws_rds_cluster" "onmoauth-aurora-cluster" {
+  cluster_identifier              = "onmoauth-aurora-${var.app_name}"
+  engine                          = "aurora-mysql"
+  engine_version                  = "5.7.mysql_aurora.2.09.2"
+  database_name                   = "onmo"
+  master_username                 = var.onmoauth_username
+  master_password                 = var.onmoauth_password
+  port                            = var.onmoauth_port
+  vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
+  db_cluster_parameter_group_name = "default.aurora-mysql5.7"
+  #multi_az                  = false
+  backup_retention_period      = 1
+  preferred_backup_window      = "11:20-11:50"
+  preferred_maintenance_window = "tue:12:36-tue:13:06"
+  final_snapshot_identifier    = "onmoauth-aurora-${var.app_name}-cluster-final"
+  tags = merge({
+    Name = "db-${terraform.workspace}"
+  }, var.tags)
+}
+
+resource "aws_rds_cluster_instance" "cluster_instances" {
+  count              = 2
+  identifier         = "onmoauth-aurora-${var.app_name}-instance-${count.index}"
+  cluster_identifier = aws_rds_cluster.onmoauth-aurora-cluster.id
+  instance_class     = "db.r5.large"
+  #availability_zone       = ["us-east-1a", "us-east-1b"]
+  db_subnet_group_name    = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
+  engine                  = aws_rds_cluster.onmoauth-aurora-cluster.engine
+  engine_version          = aws_rds_cluster.onmoauth-aurora-cluster.engine_version
   publicly_accessible     = false
   db_parameter_group_name = "default.aurora-mysql5.7"
   promotion_tier          = 1
