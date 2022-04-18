@@ -23,17 +23,31 @@ variable "AWS_REGION" {
 }
 
 
+variable "onmoauth_username" {
+  description = "Username for the master DB user"
+  default     = "admin"
+}
+
+variable "onmoauth_password" {
+  description = "Password for the master DB user"
+}
+
+variable "onmoauth_port" {
+  description = "The port on which the DB accepts connections"
+  default     = 3306
+}
+
 variable "onmostealth_username" {
-  description = "The CIDR block for the VPC. Default value is a valid CIDR, but not acceptable by AWS and should be overridden"
+  description = "Username for the master DB user"
   default     = "admin"
 }
 
 variable "onmostealth_password" {
-  description = "A list of availability zones names or ids in the region"
+  description = "Password for the master DB user"
 }
 
 variable "onmostealth_port" {
-  description = "A list of public subnets inside the VPC"
+  description = "The port on which the DB accepts connections"
   default     = 3306
 }
 
