@@ -50,7 +50,7 @@ resource "aws_security_group" "onmo-aurora" {
 
 
 resource "aws_rds_cluster" "onmostealth-aurora-instance-1" {
-  cluster_identifier              = "onmostealth-aurora-${var.app_name}-instance-1"
+  cluster_identifier              = "onmostealth-aurora-${var.app_name}"
   engine                          = "aurora-mysql"
   engine_version                  = "5.7.mysql_aurora.2.09.2"
   database_name                   = "onmo"
