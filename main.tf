@@ -12,13 +12,8 @@ data "aws_subnet_ids" "database_subnets" {
   }
 }
 
-resource "aws_db_subnet_group" "onmo" {
-  name       = "onmo"
-  subnet_ids = data.aws_subnet_ids.database_subnets.ids
-
-  tags = {
-    Name = "onmo DB subnet group"
-  }
+data "aws_db_subnet_group" "onmo" {
+  name = "${var.app_name}-vpc"
 }
 
 resource "aws_security_group" "onmo-aurora" {
@@ -59,7 +54,7 @@ resource "aws_rds_cluster" "onmostealth-aurora-cluster" {
   port                            = var.onmostealth_port
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
-  db_subnet_group_name    = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
+  db_subnet_group_name            = data.aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
   #multi_az                  = false
   backup_retention_period      = 1
   preferred_backup_window      = "11:20-11:50"
@@ -83,18 +78,33 @@ resource "aws_rds_cluster_instance" "onmostealth-aurora-cluster_instances" {
   promotion_tier          = 1
 }
 
+resource "aws_ssm_parameter" "onmoauth_password" {
+  name        = "rds-password"
+  type        = "String"
+  description = "The password of onmostealth-aurora-${var.app_name}-instance-1 database"
+  value       = var.onmoauth_password
+  tags        = var.tags
+}
+
+resource "aws_ssm_parameter" "onmoauth_endpoint" {
+  name        = "rds-endpoint"
+  type        = "String"
+  description = "url of the onmostealth-aurora-${var.app_name}-instance-1 database writer instance "
+  value       = aws_rds_cluster.onmostealth-aurora-cluster.endpoint
+  tags        = var.tags
+}
 
 resource "aws_rds_cluster" "onmoauth-aurora-cluster" {
   cluster_identifier              = "onmoauth-aurora-${var.app_name}"
   engine                          = "aurora-mysql"
   engine_version                  = "5.7.mysql_aurora.2.09.2"
-  database_name                   = "onmo"
+  database_name                   = "onmoauth"
   master_username                 = var.onmoauth_username
   master_password                 = var.onmoauth_password
   port                            = var.onmoauth_port
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
-  db_subnet_group_name    = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
+  db_subnet_group_name            = data.aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
   #multi_az                  = false
   backup_retention_period      = 1
   preferred_backup_window      = "11:20-11:50"
