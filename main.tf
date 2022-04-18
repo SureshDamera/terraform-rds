@@ -69,7 +69,7 @@ resource "aws_rds_cluster" "onmostealth-aurora-cluster" {
   }, var.tags)
 }
 
-resource "aws_rds_cluster_instance" "cluster_instances" {
+resource "aws_rds_cluster_instance" "onmostealth-aurora-cluster_instances" {
   count              = 1
   identifier         = "onmostealth-aurora-${var.app_name}-instance-1"
   cluster_identifier = aws_rds_cluster.onmostealth-aurora-cluster.id
@@ -104,7 +104,7 @@ resource "aws_rds_cluster" "onmoauth-aurora-cluster" {
   }, var.tags)
 }
 
-resource "aws_rds_cluster_instance" "cluster_instances" {
+resource "aws_rds_cluster_instance" "onmoauth-aurora-cluster_instances" {
   count              = 2
   identifier         = "onmoauth-aurora-${var.app_name}-instance-${count.index}"
   cluster_identifier = aws_rds_cluster.onmoauth-aurora-cluster.id
