@@ -12,10 +12,6 @@ data "aws_subnet_ids" "database_subnets" {
   }
 }
 
-data "aws_db_subnet_group" "onmo" {
-  name = "${var.app_name}-vpc"
-}
-
 resource "aws_security_group" "onmo-aurora" {
   name        = "aurora_db_sg"
   description = "Allow Aurora DB traffic"
@@ -54,7 +50,7 @@ resource "aws_rds_cluster" "onmostealth-aurora-cluster" {
   port                            = var.onmostealth_port
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
-  db_subnet_group_name            = data.aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
+  db_subnet_group_name            = "${var.app_name}-vpc"
   #multi_az                  = false
   backup_retention_period      = 1
   preferred_backup_window      = "11:20-11:50"
@@ -104,7 +100,7 @@ resource "aws_rds_cluster" "onmoauth-aurora-cluster" {
   port                            = var.onmoauth_port
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
-  db_subnet_group_name            = data.aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
+  db_subnet_group_name            = "${var.app_name}-vpc"
   #multi_az                  = false
   backup_retention_period      = 1
   preferred_backup_window      = "11:20-11:50"
