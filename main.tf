@@ -59,6 +59,7 @@ resource "aws_rds_cluster" "onmostealth-aurora-cluster" {
   port                            = var.onmostealth_port
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
+  db_subnet_group_name            = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
   #multi_az                  = false
   backup_retention_period      = 1
   preferred_backup_window      = "11:20-11:50"
@@ -75,7 +76,6 @@ resource "aws_rds_cluster_instance" "onmostealth-aurora-cluster_instances" {
   cluster_identifier = aws_rds_cluster.onmostealth-aurora-cluster.id
   instance_class     = "db.r5.large"
   #availability_zone       = ["us-east-1a", "us-east-1b"]
-  db_subnet_group_name    = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
   engine                  = aws_rds_cluster.onmostealth-aurora-cluster.engine
   engine_version          = aws_rds_cluster.onmostealth-aurora-cluster.engine_version
   publicly_accessible     = false
@@ -94,6 +94,7 @@ resource "aws_rds_cluster" "onmoauth-aurora-cluster" {
   port                            = var.onmoauth_port
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
+  db_subnet_group_name            = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
   #multi_az                  = false
   backup_retention_period      = 1
   preferred_backup_window      = "11:20-11:50"
@@ -109,8 +110,7 @@ resource "aws_rds_cluster_instance" "onmoauth-aurora-cluster_instances" {
   identifier         = "onmoauth-aurora-${var.app_name}-instance-${count.index}"
   cluster_identifier = aws_rds_cluster.onmoauth-aurora-cluster.id
   instance_class     = "db.r5.large"
-  #availability_zone       = ["us-east-1a", "us-east-1b"]
-  db_subnet_group_name    = aws_db_subnet_group.onmo.name #"default-vpc-04be9032fa38110b8"
+  #availability_zone       = ["us-east-1a", "us-east-1b"] 
   engine                  = aws_rds_cluster.onmoauth-aurora-cluster.engine
   engine_version          = aws_rds_cluster.onmoauth-aurora-cluster.engine_version
   publicly_accessible     = false
