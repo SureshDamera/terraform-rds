@@ -74,7 +74,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   identifier              = "onmostealth-aurora-${var.app_name}-instance-1"
   cluster_identifier      = aws_rds_cluster.onmostealth-aurora-instance-1.id
   instance_class          = "db.r5.large"
-  availability_zones      = ["us-east-1a", "us-east-1b"]
+  availability_zone       = ["us-east-1a", "us-east-1b"]
   db_subnet_group_name    = aws_db_subnet_group.onmostealth-aurora-instance-1.name #"default-vpc-04be9032fa38110b8"
   engine                  = aws_rds_cluster.onmostealth-aurora-instance-1.engine
   engine_version          = aws_rds_cluster.onmostealth-aurora-instance-1.engine_version
