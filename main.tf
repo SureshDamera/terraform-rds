@@ -20,7 +20,7 @@ resource "aws_iam_role" "rds-proxy-role" {
 resource "aws_iam_policy" "rds-proxy-policy" {
   name        = "rds-proxy-policy"
   description = "A rds-proxy-policy"
-  policy      = "${file("policys3bucket.json")}"
+  policy      = "${file("policyrdsproxy.json")}"
 }
 
 resource "aws_iam_policy_attachment" "rds-proxy-policy-attach" {
