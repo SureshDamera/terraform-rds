@@ -19,19 +19,19 @@ data "aws_subnets" "database_subnets" {
 
 resource "aws_iam_role" "rds-proxy-role" {
   name               = "rds-proxy-role"
-  assume_role_policy = "${file("assumerolepolicy.json")}"
+  assume_role_policy = file("assumerolepolicy.json")
 }
 
 resource "aws_iam_policy" "rds-proxy-policy" {
   name        = "rds-proxy-policy"
   description = "A rds-proxy-policy"
-  policy      = "${file("policyrdsproxy.json")}"
+  policy      = file("policyrdsproxy.json")
 }
 
 resource "aws_iam_policy_attachment" "rds-proxy-policy-attach" {
   name       = "rds-proxy-policy-attachment"
   roles      = ["${aws_iam_role.rds-proxy-role.name}"]
-  policy_arn = "${aws_iam_policy.rds-proxy-policy.arn}"
+  policy_arn = aws_iam_policy.rds-proxy-policy.arn
 }
 
 resource "aws_security_group" "onmo-aurora" {
@@ -104,12 +104,12 @@ resource "aws_secretsmanager_secret_version" "onmostealth_rds_credentials" {
   secret_id     = aws_secretsmanager_secret.onmostealth-aurora-cluster.id
   secret_string = <<EOF
 {
-  "username": "${var.onmostealth_username}",
-  "password": "${random_password.onmoauth_master_password.result},
-  "engine": "mysql",
-  "host": "${aws_rds_cluster.onmostealth-aurora-cluster.endpoint}",
+  "username": ${var.onmostealth_username},
+  "password": ${random_password.onmoauth_master_password.result},
+  "engine": mysql,
+  "host": ${aws_rds_cluster.onmostealth-aurora-cluster.endpoint},
   "port": ${var.onmostealth_port},
-  "dbClusterIdentifier": "${aws_rds_cluster.onmostealth-aurora-cluster.cluster_identifier}"
+  "dbClusterIdentifier": ${aws_rds_cluster.onmostealth-aurora-cluster.cluster_identifier}
 }
 EOF
 }
@@ -207,12 +207,12 @@ resource "aws_secretsmanager_secret_version" "onmoauth_rds_credentials" {
   secret_id     = aws_secretsmanager_secret.onmoauth-aurora-cluster.id
   secret_string = <<EOF
 {
-  "username": "${var.onmoauth_username}",
-  "password": "${var.onmoauth_password}",
-  "engine": "mysql",
-  "host": "${aws_rds_cluster.onmoauth-aurora-cluster.endpoint}",
+  "username": ${var.onmoauth_username},
+  "password": ${var.onmoauth_password},
+  "engine": mysql,
+  "host": ${aws_rds_cluster.onmoauth-aurora-cluster.endpoint},
   "port": ${var.onmoauth_port},
-  "dbClusterIdentifier": "${aws_rds_cluster.onmoauth-aurora-cluster.cluster_identifier}"
+  "dbClusterIdentifier": ${aws_rds_cluster.onmoauth-aurora-cluster.cluster_identifier}
 }
 EOF
 }
