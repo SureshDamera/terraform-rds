@@ -92,6 +92,25 @@ resource "aws_secretsmanager_secret_version" "rds_credentials" {
 EOF
 }
 
+resource "aws_db_proxy" "onmostealth-aurora-cluster" {
+  name                   = "onmostealth-aurora-${var.app_name}-cluster"
+  debug_logging          = false
+  engine_family          = "MYSQL"
+  idle_client_timeout    = 1800
+  require_tls            = true
+  role_arn               = aws_iam_role.example.arn
+  vpc_security_group_ids = [aws_security_group.onmo-aurora.id]
+  vpc_subnet_ids         = [aws_subnet_ids.database_subnets.id]
+
+  auth {
+    auth_scheme = "SECRETS"
+    iam_auth    = "DISABLED"
+    secret_arn  = aws_secretsmanager_secret.onmostealth-aurora-cluster.arn
+  }
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "onmoauth_password" {
   name        = "rds-password"
   type        = "String"
