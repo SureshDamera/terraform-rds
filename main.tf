@@ -98,7 +98,7 @@ resource "aws_db_proxy" "onmostealth-aurora-cluster" {
   debug_logging          = false
   engine_family          = "MYSQL"
   idle_client_timeout    = 1800
-  require_tls            = true
+  require_tls            = false
   role_arn               = "arn:aws:iam::061595818454:role/service-role/rds-proxy-role-1650620517754"
   vpc_security_group_ids = [aws_security_group.onmo-aurora.id]
   vpc_subnet_ids         = data.aws_subnets.database_subnets.ids
