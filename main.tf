@@ -12,6 +12,14 @@ data "aws_subnet_ids" "database_subnets" {
   }
 }
 
+data "aws_subnets" "database_subnets" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.app_name}-vpc-db-*"]
+  }
+}
+
+
 resource "aws_security_group" "onmo-aurora" {
   name        = "aurora_db_sg"
   description = "Allow Aurora DB traffic"
@@ -98,9 +106,9 @@ resource "aws_db_proxy" "onmostealth-aurora-cluster" {
   engine_family          = "MYSQL"
   idle_client_timeout    = 1800
   require_tls            = true
-  role_arn               = aws_iam_role.example.arn
+  role_arn               = "arn:aws:iam::061595818454:role/service-role/rds-proxy-role-1650620517754"
   vpc_security_group_ids = [aws_security_group.onmo-aurora.id]
-  vpc_subnet_ids         = [aws_subnet_ids.database_subnets.id]
+  vpc_subnet_ids         = [aws_subnets.database_subnets.ids]
 
   auth {
     auth_scheme = "SECRETS"
