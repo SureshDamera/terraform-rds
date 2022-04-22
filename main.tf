@@ -76,7 +76,7 @@ resource "aws_rds_cluster_instance" "onmostealth-aurora-cluster_instances" {
 }
 
 resource "aws_secretsmanager_secret" "onmostealth-aurora-cluster" {
-  name = "onmostealth-aurora-${var.app_name}-cluster"
+  name = "onmostealth-aurora-${var.app_name}"
 }
 
 resource "aws_secretsmanager_secret_version" "rds_credentials" {
