@@ -104,12 +104,12 @@ resource "aws_secretsmanager_secret_version" "onmostealth_rds_credentials" {
   secret_id     = aws_secretsmanager_secret.onmostealth-aurora-cluster.id
   secret_string = <<EOF
 {
-  "username": ${var.onmostealth_username},
-  "password": ${random_password.onmoauth_master_password.result},
-  "engine": mysql,
-  "host": ${aws_rds_cluster.onmostealth-aurora-cluster.endpoint},
-  "port": ${var.onmostealth_port},
-  "dbClusterIdentifier": ${aws_rds_cluster.onmostealth-aurora-cluster.cluster_identifier}
+  "username": "${var.onmostealth_username}",
+  "password": "${random_password.onmoauth_master_password.result}",
+  "engine": "mysql",
+  "host": "${aws_rds_cluster.onmostealth-aurora-cluster.endpoint}",
+  "port": "${var.onmostealth_port}",
+  "dbClusterIdentifier": "${aws_rds_cluster.onmostealth-aurora-cluster.cluster_identifier}"
 }
 EOF
 }
