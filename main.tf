@@ -130,7 +130,7 @@ resource "aws_db_proxy_default_target_group" "onmostealth-aurora-cluster" {
 }
 
 resource "aws_db_proxy_target" "onmostealth-aurora-cluster" {
-  db_instance_identifier = aws_rds_cluster_instance.onmostealth-aurora-cluster_instances.id
+  db_instance_identifier = aws_rds_cluster_instance.onmostealth-aurora-cluster_instances[count.index]
   db_proxy_name          = aws_db_proxy.onmostealth-aurora-cluster.name
   target_group_name      = aws_db_proxy_default_target_group.onmostealth-aurora-cluster.name
 }
