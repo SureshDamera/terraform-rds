@@ -1,3 +1,8 @@
+resource "random_password" "onmoauth_master_password" {
+  length  = 16
+  special = false
+}
+
 data "aws_vpc" "vpc_name" {
   filter {
     name   = "tag:Name"
@@ -63,7 +68,7 @@ resource "aws_rds_cluster" "onmostealth-aurora-cluster" {
   engine_version                  = "5.7.mysql_aurora.2.09.2"
   database_name                   = "onmo"
   master_username                 = var.onmostealth_username
-  master_password                 = var.onmostealth_password
+  master_password                 = random_password.onmoauth_master_password.result
   port                            = var.onmostealth_port
   vpc_security_group_ids          = [aws_security_group.onmo-aurora.id]
   db_cluster_parameter_group_name = "default.aurora-mysql5.7"
@@ -95,12 +100,12 @@ resource "aws_secretsmanager_secret" "onmostealth-aurora-cluster" {
   name = "onmostealth-aurora-${var.app_name}"
 }
 
-resource "aws_secretsmanager_secret_version" "rds_credentials" {
+resource "aws_secretsmanager_secret_version" "onmostealth_rds_credentials" {
   secret_id     = aws_secretsmanager_secret.onmostealth-aurora-cluster.id
   secret_string = <<EOF
 {
   "username": "${var.onmostealth_username}",
-  "password": "${var.onmostealth_password}",
+  "password": random_password.onmoauth_master_password.result,
   "engine": "mysql",
   "host": "${aws_rds_cluster.onmostealth-aurora-cluster.endpoint}",
   "port": ${var.onmostealth_port},
@@ -194,4 +199,20 @@ resource "aws_rds_cluster_instance" "onmoauth-aurora-cluster_instances" {
   promotion_tier          = 1
 }
 
+resource "aws_secretsmanager_secret" "onmoauth-aurora-cluster" {
+  name = "onmoauth-aurora-${var.app_name}"
+}
 
+resource "aws_secretsmanager_secret_version" "onmoauth_rds_credentials" {
+  secret_id     = aws_secretsmanager_secret.onmoauth-aurora-cluster.id
+  secret_string = <<EOF
+{
+  "username": "${var.onmoauth_username}",
+  "password": "${var.onmoauth_password}",
+  "engine": "mysql",
+  "host": "${aws_rds_cluster.onmoauth-aurora-cluster.endpoint}",
+  "port": ${var.onmoauth_port},
+  "dbClusterIdentifier": "${aws_rds_cluster.onmoauth-aurora-cluster.cluster_identifier}"
+}
+EOF
+}
