@@ -5,13 +5,6 @@ data "aws_vpc" "vpc_name" {
   }
 }
 
-data "aws_subnet_ids" "database_subnets" {
-  vpc_id = data.aws_vpc.vpc_name.id
-  tags = {
-    Name = "${var.app_name}-vpc-db-*"
-  }
-}
-
 data "aws_subnets" "database_subnets" {
   filter {
     name   = "tag:Name"
@@ -130,7 +123,6 @@ resource "aws_db_proxy_default_target_group" "onmostealth-aurora-cluster" {
 }
 
 resource "aws_db_proxy_target" "onmostealth-aurora-cluster" {
-  count                  = 1
   db_instance_identifier = aws_rds_cluster.onmostealth-aurora-cluster.cluster_identifier
   db_proxy_name          = aws_db_proxy.onmostealth-aurora-cluster.name
   target_group_name      = aws_db_proxy_default_target_group.onmostealth-aurora-cluster.name
