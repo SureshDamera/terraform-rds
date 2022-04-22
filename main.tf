@@ -149,6 +149,13 @@ resource "aws_db_proxy_target" "onmostealth-aurora-cluster" {
   target_group_name     = aws_db_proxy_default_target_group.onmostealth-aurora-cluster.name
 }
 
+resource "aws_db_proxy_endpoint" "onmostealth-aurora-cluster" {
+  db_proxy_name          = aws_db_proxy.onmostealth-aurora-cluster.name
+  db_proxy_endpoint_name = "onmostealth-aurora-cluster-readonly"
+  vpc_subnet_ids         = data.aws_subnets.database_subnets.ids
+  target_role            = "READ_ONLY"
+}
+
 resource "aws_ssm_parameter" "onmoauth_password" {
   name        = "rds-password"
   type        = "String"
@@ -207,12 +214,12 @@ resource "aws_secretsmanager_secret_version" "onmoauth_rds_credentials" {
   secret_id     = aws_secretsmanager_secret.onmoauth-aurora-cluster.id
   secret_string = <<EOF
 {
-  "username": ${var.onmoauth_username},
-  "password": ${var.onmoauth_password},
-  "engine": mysql,
-  "host": ${aws_rds_cluster.onmoauth-aurora-cluster.endpoint},
-  "port": ${var.onmoauth_port},
-  "dbClusterIdentifier": ${aws_rds_cluster.onmoauth-aurora-cluster.cluster_identifier}
+  "username": "${var.onmoauth_username}",
+  "password": "${var.onmoauth_password}",
+  "engine": "mysql",
+  "host": "${aws_rds_cluster.onmoauth-aurora-cluster.endpoint}",
+  "port": "${var.onmoauth_port}",
+  "dbClusterIdentifier": "${aws_rds_cluster.onmoauth-aurora-cluster.cluster_identifier}"
 }
 EOF
 }
