@@ -74,6 +74,24 @@ resource "aws_rds_cluster_instance" "onmostealth-aurora-cluster_instances" {
   promotion_tier          = 1
 }
 
+resource "aws_secretsmanager_secret" "onmostealth-aurora-cluster" {
+  name = "onmostealth-aurora-${var.app_name}-cluster"
+}
+
+resource "aws_secretsmanager_secret_version" "rds_credentials" {
+  secret_id     = aws_secretsmanager_secret.onmostealth-aurora-cluster.id
+  secret_string = <<EOF
+{
+  "username": "${var.onmostealth_username}",
+  "password": "${var.onmostealth_password}",
+  "engine": "mysql",
+  "host": "${aws_rds_cluster.onmostealth-aurora-cluster.endpoint}",
+  "port": ${var.onmostealth_port},
+  "dbClusterIdentifier": "${aws_rds_cluster.onmostealth-aurora-cluster.cluster_identifier}"
+}
+EOF
+}
+
 resource "aws_ssm_parameter" "onmoauth_password" {
   name        = "rds-password"
   type        = "String"
@@ -123,4 +141,5 @@ resource "aws_rds_cluster_instance" "onmoauth-aurora-cluster_instances" {
   db_parameter_group_name = "default.aurora-mysql5.7"
   promotion_tier          = 1
 }
+
 
