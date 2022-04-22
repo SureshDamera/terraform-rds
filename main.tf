@@ -12,6 +12,22 @@ data "aws_subnets" "database_subnets" {
   }
 }
 
+resource "aws_iam_role" "rds-proxy-role" {
+  name               = "rds-proxy-role"
+  assume_role_policy = "${file("assumerolepolicy.json")}"
+}
+
+resource "aws_iam_policy" "rds-proxy-policy" {
+  name        = "rds-proxy-policy"
+  description = "A rds-proxy-policy"
+  policy      = "${file("policys3bucket.json")}"
+}
+
+resource "aws_iam_policy_attachment" "rds-proxy-policy-attach" {
+  name       = "rds-proxy-policy-attachment"
+  roles      = ["${aws_iam_role.rds-proxy-role.name}"]
+  policy_arn = "${aws_iam_policy.rds-proxy-policy.arn}"
+}
 
 resource "aws_security_group" "onmo-aurora" {
   name        = "aurora_db_sg"
@@ -99,7 +115,7 @@ resource "aws_db_proxy" "onmostealth-aurora-cluster" {
   engine_family          = "MYSQL"
   idle_client_timeout    = 1800
   require_tls            = false
-  role_arn               = "arn:aws:iam::061595818454:role/service-role/rds-proxy-role-1650620517754"
+  role_arn               = aws_iam_role.rds-proxy-role.arn
   vpc_security_group_ids = [aws_security_group.onmo-aurora.id]
   vpc_subnet_ids         = data.aws_subnets.database_subnets.ids
 
