@@ -119,6 +119,22 @@ resource "aws_db_proxy" "onmostealth-aurora-cluster" {
   tags = var.tags
 }
 
+resource "aws_db_proxy_default_target_group" "onmostealth-aurora-cluster" {
+  db_proxy_name = aws_db_proxy.onmostealth-aurora-cluster.name
+
+  connection_pool_config {
+    connection_borrow_timeout    = 120
+    max_connections_percent      = 100
+    max_idle_connections_percent = 50
+  }
+}
+
+resource "aws_db_proxy_target" "onmostealth-aurora-cluster" {
+  db_instance_identifier = aws_rds_cluster_instance.onmostealth-aurora-cluster_instances.id
+  db_proxy_name          = aws_db_proxy.onmostealth-aurora-cluster.name
+  target_group_name      = aws_db_proxy_default_target_group.onmostealth-aurora-cluster.name
+}
+
 resource "aws_ssm_parameter" "onmoauth_password" {
   name        = "rds-password"
   type        = "String"
