@@ -108,7 +108,7 @@ resource "aws_db_proxy" "onmostealth-aurora-cluster" {
   require_tls            = true
   role_arn               = "arn:aws:iam::061595818454:role/service-role/rds-proxy-role-1650620517754"
   vpc_security_group_ids = [aws_security_group.onmo-aurora.id]
-  vpc_subnet_ids         = aws_subnets.database_subnets.ids
+  vpc_subnet_ids         = data.aws_subnets.database_subnets.ids
 
   auth {
     auth_scheme = "SECRETS"
